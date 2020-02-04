@@ -1,8 +1,7 @@
 import React from 'react'
 import axios from 'axios'
-import MapGL, { Marker } from 'react-map-gl'
-import 'mapbox-gl/dist/mapbox-gl.css'
-const mapboxToken = 'pk.eyJ1IjoiZ2VvcmdlYW50aG9ueTMzIiwiYSI6ImNrNWk4em1zaTBiMTQzb252YWE1NnE5OTYifQ.AYcwzyS0FqF4sa8e5mGIHA'
+// import MapGL, { Marker } from 'react-map-gl'
+// import 'mapbox-gl/dist/mapbox-gl.css'
 
 class PlayerShow extends React.Component {
   state = {
@@ -110,7 +109,7 @@ class PlayerShow extends React.Component {
                 <h5>Place of birth</h5><h5>Place</h5>
               </div>
               <div className="map">
-                <MapGL
+                {/* <MapGL
                   mapboxApiAccessToken={mapboxToken}
                   height={'300px'}
                   width={'300px'}
@@ -125,7 +124,7 @@ class PlayerShow extends React.Component {
                   >
                     <div className="marker"></div>
                   </Marker>
-                </MapGL>
+                </MapGL> */}
               </div>
             </div>
 
