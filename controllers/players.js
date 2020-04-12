@@ -79,4 +79,32 @@ function commentDelete (req, res) {
     .catch(err => res.json(err))
 }
 
-module.exports = { index, create, show, update, remove, commentCreate, commentDelete }
+function rate (req, res) {
+  req.body.user = req.currentUser
+  Player
+    .findById(req.params.id)
+    .then(player => {
+      if (!player) return res.status(404).json({ message: 'No Player Found' })
+      const filteredRatings = player.ratings.filter(rating => !rating.user.equals(req.currentUser._id))
+      player.ratings = filteredRatings
+      player.ratings.push(req.body)
+      return player.save()
+    })
+    .then(updatedPlayer => res.status(200).json(updatedPlayer))
+    .catch(err => res.json(err))
+}
+
+// function like(req, res) {
+//   Player
+//     .findById(req.params.id)
+//     .then(player => {
+//       if (!player) return res.status(404).json({ message: 'Not Found ' })
+//       if (player.likes.some(like => like.user.equals(req.currentUser._))) return player
+//       player.likes.push(req.currentUser)
+//       return player.save()
+//     })
+//     .then(player => res.status(202).json(player))
+//     .catch(err => res.json(err))
+// }
+
+module.exports = { index, create, show, update, remove, commentCreate, commentDelete, rate }

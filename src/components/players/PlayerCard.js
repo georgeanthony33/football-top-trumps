@@ -12,10 +12,113 @@ function getAge(DOB) {
   return age
 }
 
-const PlayerCard = ({ name, position, number, image, team, color1, dob, height, attack, defence, power, skill, comments, user, _id }) => {
+const teamObject = {
+  'Arsenal': {
+    teamCode: 'ARS',
+    color1: 'red',
+    color2: 'white2'
+  },
+  'Aston Villa': {
+    teamCode: 'AST',
+    color1: 'maroon',
+    color2: 'white2'
+  },
+  'Bournemouth': {
+    teamCode: 'BOU',
+    color1: 'red',
+    color2: 'white2'
+  },
+  'Brighton': {
+    teamCode: 'BRI',
+    color1: 'blue',
+    color2: 'white2'
+  },
+  'Burnley': {
+    teamCode: 'BUR',
+    color1: 'maroon',
+    color2: 'white2'
+  },
+  'Chelsea': {
+    teamCode: 'CHE',
+    color1: 'blue',
+    color2: 'white2'
+  },
+  'Crystal Palace': {
+    teamCode: 'CRY',
+    color1: 'red',
+    color2: 'white2'
+  },
+  'Everton': {
+    teamCode: 'EVE',
+    color1: 'blue',
+    color2: 'white2'
+  },
+  'Liverpool': {
+    teamCode: 'LIV',
+    color1: 'red',
+    color2: 'white2'
+  },
+  'Leicester City': {
+    teamCode: 'LEI',
+    color1: 'blue',
+    color2: 'white2'
+  },
+  'Manchester City': {
+    teamCode: 'MNC',
+    color1: 'skyblue',
+    color2: 'black2'
+  },
+  'Manchester United': {
+    teamCode: 'MNU',
+    color1: 'red',
+    color2: 'white2'
+  },
+  'Newcastle United': {
+    teamCode: 'ARS',
+    color1: 'black',
+    color2: 'white2'
+  },
+  'Norwich City': {
+    teamCode: 'NOW',
+    color1: 'yellow',
+    color2: 'black2'
+  },
+  'Sheffield United': {
+    teamCode: 'SHE',
+    color1: 'red',
+    color2: 'white2'
+  },
+  'Southampton': {
+    teamCode: 'SOU',
+    color1: 'red',
+    color2: 'white2'
+  },
+  'Tottenham Hotspur': {
+    teamCode: 'TOT',
+    color1: 'navyblue',
+    color2: 'black2'
+  },
+  'Watford': {
+    teamCode: 'WAT',
+    color1: 'yellow',
+    color2: 'black2'
+  },
+  'West Ham United': {
+    teamCode: 'WHU',
+    color1: 'maroon',
+    color2: 'white2'
+  },
+  'Wolves': {
+    teamCode: 'WOL',
+    color1: 'orange',
+    color2: 'black2'
+  }
+}
+
+const PlayerCard = ({ name, image, team, dob, height, attack, defence, power, skill, _id }) => {
   return (
-    <div className="player-card-outer" id={color1}>  
-      <Link to={`/players/${_id}/${getAge(dob)}`} >
+    <div className="player-card-outer" id={teamObject[team].color1}>  
+      <Link to={`/players/${_id}`} >
         <div className="player-card">  
           <div className="card-header">
             <h3>{name}</h3>
@@ -57,6 +160,9 @@ const PlayerCard = ({ name, position, number, image, team, color1, dob, height, 
           </div>
         </div>
       </Link>
+      {/* <div className="button-field">
+        <button onClick={handleClick}>Like</button>
+      </div> */}
     </div>
   )
 }

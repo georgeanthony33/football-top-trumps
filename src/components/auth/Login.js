@@ -8,7 +8,7 @@ class Login extends React.Component {
       email: '',
       password: ''
     },
-    errors: {}
+    errors: ''
   }
 
   handleChange = ({ target: { name, value } }) => {

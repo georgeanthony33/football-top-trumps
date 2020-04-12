@@ -18,6 +18,12 @@ router.route('/players/:id/comments')
 router.route('/players/:id/comments/:commentId')
   .delete(secureRoute, players.commentDelete)
 
+// router.route('/players/:id/likes')
+//   .post(secureRoute, players.like
+
+router.route('/players/:id/rating')
+  .post(secureRoute, players.rate)
+
 router.route('/register')
   .post(users.register)
 

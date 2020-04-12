@@ -1,11 +1,27 @@
 import React from 'react'
 import axios from 'axios'
-// import MapGL, { Marker } from 'react-map-gl'
-// import 'mapbox-gl/dist/mapbox-gl.css'
+import { Link } from 'react-router-dom'
+import Auth from '../../lib/Auth'
+import FrontAuth from '../../lib/Auth'
 
 class PlayerShow extends React.Component {
   state = {
-    player: null,
+    player: {
+      name: '',
+      position: '',
+      squadNumber: '',
+      image: '',
+      team: '',
+      dob: '',
+      height: '',
+      attack: '',
+      defence: '',
+      power: '',
+      skill: '',
+      ratings: [],
+      ratingAverage: ''
+    },
+    rating: '',
     results: null
   }
 
@@ -18,7 +34,8 @@ class PlayerShow extends React.Component {
   getPlayer = async (id) => {
     try {
       const player = await axios.get(`/api/players/${id}`)
-      this.setState({ player })
+      const rating = player.data.ratings.length === 0 ? '' : player.data.ratings.filter(rating => rating.user === FrontAuth.getPayload().sub)[0].rating
+      this.setState({ player, rating })
     } catch (err) {
       console.log(err)
     }
@@ -29,9 +46,12 @@ class PlayerShow extends React.Component {
       const dataReceived = await axios.get('https://www.scorebat.com/api/competition/3/england-premier-league/?_=1580764529164&sf=1')
       const results = dataReceived.data.response.results.filter(element => element.s1 === this.state.player.data.team || element.s2 === this.state.player.data.team)
       this.setState({ results })
-      console.log(results)
     } catch (err) {
       console.log(err)
+    } finally {
+      const dataReceived = await axios.get('https://www.scorebat.com/api/competition/3/england-premier-league/?_=1580764529164&sf=1')
+      const results = dataReceived.data.response.results.filter(element => element.s1 === this.state.player.data.team || element.s2 === this.state.player.data.team)
+      this.setState({ results })
     }
   }
 
@@ -44,32 +64,160 @@ class PlayerShow extends React.Component {
     return `${day} ${month} ${year}`
   }
 
-  getTeamCode = {
-    'Arsenal': 'ARS',
-    'Aston Villa': 'AST',
-    'Bournemouth': 'BOU',
-    'Brighton': 'BRI',
-    'Burnley': 'BUR',
-    'Chelsea': 'CHE',
-    'Crystal Palace': 'CRY',
-    'Everton': 'EVE',
-    'Liverpool': 'LIV',
-    'Leicester City': 'LEI',
-    'Manchester City': 'MNC',
-    'Manchester United': 'MNU',
-    'Newcastle United': 'NEW',
-    'Norwich City': 'NOR',
-    'Sheffield United': 'SHE',
-    'Southampton': 'SOU',
-    'Tottenham Hotspur': 'TOT',
-    'Watford': 'WAT',
-    'West Ham United': 'WHU',
-    'Wolves': 'WOL'
+  getAge = (DOB) => {
+    if (!DOB) {
+      return null
+    } else {
+      const today = new Date()
+      const birthDate = new Date(DOB)
+      let age = today.getFullYear() - birthDate.getFullYear()
+      const month = today.getMonth() - birthDate.getMonth()
+      if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) {
+        age = age - 1
+      }
+      return age
+    }
+  }
+
+  teamObject = {
+    'Arsenal': {
+      teamCode: 'ARS',
+      color1: 'red',
+      color2: 'white2'
+    },
+    'Aston Villa': {
+      teamCode: 'AST',
+      color1: 'maroon',
+      color2: 'white2'
+    },
+    'Bournemouth': {
+      teamCode: 'BOU',
+      color1: 'red',
+      color2: 'white2'
+    },
+    'Brighton': {
+      teamCode: 'BRI',
+      color1: 'blue',
+      color2: 'white2'
+    },
+    'Burnley': {
+      teamCode: 'BUR',
+      color1: 'maroon',
+      color2: 'white2'
+    },
+    'Chelsea': {
+      teamCode: 'CHE',
+      color1: 'blue',
+      color2: 'white2'
+    },
+    'Crystal Palace': {
+      teamCode: 'CRY',
+      color1: 'red',
+      color2: 'white2'
+    },
+    'Everton': {
+      teamCode: 'EVE',
+      color1: 'blue',
+      color2: 'white2'
+    },
+    'Liverpool': {
+      teamCode: 'LIV',
+      color1: 'red',
+      color2: 'white2'
+    },
+    'Leicester City': {
+      teamCode: 'LEI',
+      color1: 'blue',
+      color2: 'white2'
+    },
+    'Manchester City': {
+      teamCode: 'MNC',
+      color1: 'skyblue',
+      color2: 'black2'
+    },
+    'Manchester United': {
+      teamCode: 'MNU',
+      color1: 'red',
+      color2: 'white2'
+    },
+    'Newcastle United': {
+      teamCode: 'ARS',
+      color1: 'black',
+      color2: 'white2'
+    },
+    'Norwich City': {
+      teamCode: 'NOW',
+      color1: 'yellow',
+      color2: 'black2'
+    },
+    'Sheffield United': {
+      teamCode: 'SHE',
+      color1: 'red',
+      color2: 'white2'
+    },
+    'Southampton': {
+      teamCode: 'SOU',
+      color1: 'red',
+      color2: 'white2'
+    },
+    'Tottenham Hotspur': {
+      teamCode: 'TOT',
+      color1: 'navyblue',
+      color2: 'black2'
+    },
+    'Watford': {
+      teamCode: 'WAT',
+      color1: 'yellow',
+      color2: 'black2'
+    },
+    'West Ham United': {
+      teamCode: 'WHU',
+      color1: 'maroon',
+      color2: 'white2'
+    },
+    'Wolves': {
+      teamCode: 'WOL',
+      color1: 'orange',
+      color2: 'black2'
+    }
+  }
+
+  isOwner = () => Auth.getPayload().sub === this.state.player.data.user._id
+
+  handleDelete = async () => {
+    const playerId = this.props.match.params.id
+    try {
+      await axios.delete(`/api/players/${playerId}`, {
+        headers: { Authorization: `Bearer ${Auth.getToken()}` }
+      })
+      this.props.history.push('/players')
+    } catch (err) {
+      this.props.history.push('/')
+    }
+  }
+
+  handleChange = async ({ target: { value } }) => {
+    const rating = value
+    this.setState({ rating })
+    this.submitRating(rating)
+  }
+
+  submitRating = async (rating) => {
+    const playerId = this.props.match.params.id
+    try {
+      await axios.post(`/api/players/${playerId}/rating`, { rating }, {
+        headers: { Authorization: `Bearer ${Auth.getToken()}` }
+      })
+      this.getPlayer(playerId)
+    } catch (err) {
+      this.setState({ errors: err.response.data.errors })
+    }
   }
   
   render() {
     if (!this.state.player) return null
     if (!this.state.results) return null
+    console.log(this.state)
     return (
       <>
         <div className="page-title">
@@ -78,16 +226,117 @@ class PlayerShow extends React.Component {
 
         <div className="show-page-container">
 
-          <div className="show-page-top" id={this.state.player.data.color1}>
+          <div className="show-page-top" id={this.teamObject[this.state.player.data.team].color1}>
             <div className="show-page-image">
               <img src={this.state.player.data.image} alt={this.state.player.data.team} />
             </div>
-            <div className="show-page-name">
+            <div className="show-page-name-rating">
               <h2>{this.state.player.data.name}</h2>
-              <h3>{this.state.player.data.position}</h3>
+              <div className="show-page-rating">
+                {/* <h3>{this.state.player.data.position}</h3> */}
+                <div className="show-page-average-rating-container">
+                  <h3>Star Rating:</h3>
+                  <div className="show-page-star-container">
+                    <h3 className="show-page-star">⭐️</h3>
+                    <h3 className="show-page-average-rating">{this.state.player.data.ratingAverage}</h3>
+                  </div>
+                </div>
+                <div className="your-rating">
+                  <h3>Your Rating</h3>
+                  <div className="show-page-rating-input">
+                    <form className="show-page-rating-input">
+                      <input
+                        name="rating" 
+                        value="1"
+                        id="1"
+                        className="radio-button-rating"
+                        type="radio"
+                        onChange={this.handleChange}
+                        checked={this.state.rating === 1}
+                      />
+                      <label className="position-label-rating" htmlFor="1">  
+                        {this.state.rating >= 1 && '⭐️'}
+                        {(!this.state.rating || this.state.rating < 1) && '☆'}
+                      </label>
+                    </form>
+                    <form className="show-page-rating-input">
+                      <input 
+                        name="rating" 
+                        value="2"
+                        id="2"
+                        className="radio-button-rating"
+                        type="radio" 
+                        onChange={this.handleChange}
+                        checked={this.state.rating === 2}
+                      />
+                      <label className="position-label-rating" htmlFor="2">  
+                        {this.state.rating >= 2 && '⭐️'}
+                        {(!this.state.rating || this.state.rating < 2) && '☆'}
+                      </label>
+                    </form>
+                    <form className="show-page-rating-input">
+                      <input 
+                        name="rating" 
+                        value="3"
+                        id="3"
+                        className="radio-button-rating"
+                        type="radio" 
+                        onChange={this.handleChange}
+                        checked={this.state.rating === 3}
+                      />
+                      <label className="position-label-rating" htmlFor="3">  
+                        {this.state.rating >= 3 && '⭐️'}
+                        {(!this.state.rating || this.state.rating < 3) && '☆'}
+                      </label>
+                    </form>
+                    <form className="show-page-rating-input">
+                      <input 
+                        name="rating" 
+                        value="4"
+                        id="4"
+                        className="radio-button-rating"
+                        type="radio" 
+                        onChange={this.handleChange}
+                        checked={this.state.rating === 4}
+                      />
+                      <label className="position-label-rating" htmlFor="4">  
+                        {this.state.rating >= 4 && '⭐️'}
+                        {(!this.state.rating || this.state.rating < 4) && '☆'}
+                      </label>
+                    </form>
+                    <form className="show-page-rating-input">
+                      <input 
+                        name="rating" 
+                        value="5"
+                        id="5"
+                        className="radio-button-rating"
+                        type="radio"
+                        onChange={this.handleChange}
+                        checked={this.state.rating === 5}
+                      />
+                      <label className="position-label-rating" htmlFor="5">  
+                        {this.state.rating >= 5 && '⭐️'}
+                        {(!this.state.rating || this.state.rating < 5) && '☆'}
+                      </label>
+                    </form>
+                  </div>
+                  
+                </div>
+
+              </div>
+            </div>
+            <div className="show-page-buttons">
+              {this.isOwner() && 
+                <>
+                  <Link to={`/players/${this.state.player.data._id}/edit`}>
+                    <button className="radio-button">Edit Player</button>
+                  </Link>
+                  <button className="radio-button" onClick={this.handleDelete}>Delete Player</button>
+                </>
+              }
             </div>
             <div className="show-page-number">
-              <h2>{this.state.player.data.number}</h2>
+              <h2>{this.state.player.data.squadNumber}</h2>
             </div>
           </div>
 
@@ -106,25 +355,7 @@ class PlayerShow extends React.Component {
                 <h5>DOB</h5><h5>{this.getDate(this.state.player.data.dob)}</h5>
               </div>
               <div className="show-page-stats">
-                <h5>Place of birth</h5><h5>Place</h5>
-              </div>
-              <div className="map">
-                {/* <MapGL
-                  mapboxApiAccessToken={mapboxToken}
-                  height={'300px'}
-                  width={'300px'}
-                  mapStyle="mapbox://styles/mapbox/streets-v9"
-                  zoom={10}
-                  latitude={0}
-                  longitude={0}
-                >
-                  <Marker
-                    latitude={0}
-                    longitude={0}
-                  >
-                    <div className="marker"></div>
-                  </Marker>
-                </MapGL> */}
+                <h5>Nationality</h5><h5>{this.state.player.data.nationality}</h5>
               </div>
             </div>
 
@@ -133,7 +364,7 @@ class PlayerShow extends React.Component {
                 <h4>Attributes</h4>
               </div>
               <div className="show-page-stats">
-                <h5>Age</h5><h5>{this.props.match.params.age}</h5>
+                <h5>Age</h5><h5>{this.getAge(this.state.player.data.dob)}</h5>
               </div>
               <div className="show-page-stats">
                 <h5>Height</h5><h5 id="lowercase">{this.state.player.data.height} cm</h5>
@@ -157,12 +388,12 @@ class PlayerShow extends React.Component {
                 <h4>Recent Results</h4>
               </div>
               {this.state.results.map(result => (
-                <div className="show-page-results" key={result}>
+                <div className="show-page-results" key={result.id}>
                   <div className="result-date">
                     <h5 id="not-bold">{this.getDate(result.dt)}</h5>
                   </div>
                   <div className="result">
-                    <h5 className="result-team1">{this.getTeamCode[result.s1]}</h5><h5 className="result-score">{result.sc1}</h5><h5 className="result-score">{result.sc2}</h5><h5 className="result-team2">{this.getTeamCode[result.s2]}</h5>
+                    <h5 className="result-team1">{this.teamObject[this.state.results[0].s1].teamCode}</h5><h5 className="result-score">{result.sc1}</h5><h5 className="result-score">{result.sc2}</h5><h5 className="result-team2">{this.teamObject[this.state.results[0].s2].teamCode}</h5>
                   </div>
                 </div>
               ))}

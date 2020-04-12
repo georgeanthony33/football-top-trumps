@@ -5,8 +5,12 @@ import './styles/main.scss'
 
 import Home from './components/common/Home'
 import Navbar from './components/common/Navbar'
+import SecureRoute from './components/common/SecureRoute'
+import ReverseSecureRoute from './components/common/ReverseSecureRoute'
 import PlayersIndex from './components/players/PlayersIndex'
 import PlayerShow from './components/players/PlayerShow'
+import PlayerNew from './components/players/PlayerNew'
+import PlayerEdit from './components/players/PlayerEdit'
 import Register from './components/auth/Register'
 import Login from './components/auth/Login'
 
@@ -16,10 +20,12 @@ const App = () => (
       <Navbar />
       <Switch>
         <Route exact path="/" component={Home} />
-        <Route path="/players/:id/:age" component={PlayerShow} />
+        <SecureRoute path="/players/:id/edit" component={PlayerEdit} />
+        <SecureRoute path="/players/new" component={PlayerNew} />
+        <Route path="/players/:id" component={PlayerShow} />
         <Route path="/players" component={PlayersIndex} />
-        <Route path="/register" component={Register} />
-        <Route path="/login" component={Login} />
+        <ReverseSecureRoute path="/register" component={Register} />
+        <ReverseSecureRoute path="/login" component={Login} />
       </Switch>
     </main>
   </BrowserRouter>
